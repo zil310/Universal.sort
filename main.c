@@ -4,19 +4,6 @@
 #include "test.h"
 
 
-
-int cmp_int (void* el_a, void* el_b)
-
-
-int cmp_int (void* el_a, void* el_b)
-{
-    int a = *(int*) el_a;
-    int b = *(int*) el_b;
-
-    return (a > b) - (b > a);
-}
-
-
 int main ()
 {
     srand (time(NULL));
