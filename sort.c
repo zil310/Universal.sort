@@ -4,10 +4,10 @@
 static void swap (void* a, void* b, int el_size);
 
 
-int search_refer_el (void* arr, int len_arr, int el_size, int (*cmp_int)(void* el_a, void* el_b)); 
+static int search_refer_el (void* arr, int len_arr, int el_size, int (*cmp_int)(void* el_a, void* el_b)); 
 
 
-int search_refer_el (void* arr, int len_arr, int el_size, int (*cmp_int)(void* el_a, void* el_b)) 
+static int search_refer_el (void* arr, int len_arr, int el_size, int (*cmp_int)(void* el_a, void* el_b)) 
 {
     int first = 0;
     int last = len_arr - 1;

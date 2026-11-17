@@ -1,13 +1,13 @@
+#include "test.h"
+#include "sort.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "test.h"
-#include "sort.h"
 
 
 typedef int (*cmp_skf)(void* el_a, void* el_b);
-typedef void (*sort_skf)(void* arr, int len_arr, int el_size, cmp_skf cmp);
+typedef void (*sort_stf)(void* arr, int len_arr, int el_size, cmp_skf cmp);
 
 
 int cmp_int(void* el_a, void* el_b) 
@@ -102,47 +102,83 @@ void check_sort_arr (void* arr, int len_arr, int el_size, cmp_skf cmp)
 }
 
 
-void test_sort (sort_skf sort)
+void test_empt_arr (sort_stf sort)
 {
     sort (NULL, 0, sizeof(int), cmp_int);
     check_sort_arr (NULL, 0, sizeof(int), cmp_int);
+}
 
-    int one[] = {1};
-    sort (one, 1, sizeof(int), cmp_int);
-    check_sort_arr (one, 1, sizeof(int), cmp_int);
 
-    int two[] = {4, 1};
-    sort (two, 2, sizeof(int), cmp_int);
-    check_sort_arr (two, 2, sizeof(int), cmp_int);
+void test_one_arr (sort_stf sort)
+{
+    int arr[] = {1};
+    sort (arr, 1, sizeof(int), cmp_int);
+    check_sort_arr (arr, 1, sizeof(int), cmp_int);
+}
 
-    int dubs[20] = {0};
-    sort(dubs, 20, sizeof(int), cmp_int);
-    check_sort_arr(dubs, 20, sizeof(int), cmp_int);
 
-    int sizes[] = {15, 100, 10000};
-    for (int i = 0; i < 3; ++i) 
-    {
-        int len = sizes[i];
-    
+void test_two_arr (sort_stf sort)
+{
+    int arr[] = {6,7};
+    sort (arr, 2, sizeof(int), cmp_int);
+    check_sort_arr (arr, 2, sizeof(int), cmp_int);
+}
 
-        int* arr_int = generate_random_arr_int (len);
-        sort (arr_int, len, sizeof(int), cmp_int);
-        check_sort_arr (arr_int, len, sizeof(int), cmp_int);
-        free (arr_int);
 
-        char* arr_char = generate_random_arr_char (len);
-        sort (arr_char, len, sizeof(char), cmp_char);
-        check_sort_arr (arr_char, len, sizeof(char), cmp_char);
-        free (arr_char);
+void test_zero_arr (sort_stf sort)
+{   
+    int arr[20] = {0}; 
+    sort (arr, 20, sizeof(int), cmp_int);
+    check_sort_arr (arr, 20, sizeof(int), cmp_int);
+}
 
-        float* arr_float = generate_random_arr_float (len);
-        sort (arr_float, len, sizeof(float), cmp_float);
-        check_sort_arr (arr_float, len, sizeof(float), cmp_float);
-        free (arr_float);
 
-        double* arr_double = generate_random_arr_double (len);
-        sort (arr_double, len, sizeof(double), cmp_double);
-        check_sort_arr (arr_double, len, sizeof(double), cmp_double);
-        free (arr_double);
-    }    
+void test_big_random_arr (sort_stf sort)
+{
+    int len_arr = 1000;
+    int* arr = generate_random_arr_int (len_arr);
+    sort (arr, len_arr, sizeof(int), cmp_int);
+    free (arr);
+}
+
+
+void test_random_arr_char (sort_stf sort)
+{
+    int len_arr = 100;
+    char* arr = generate_random_arr_char (len_arr);
+    sort (arr, len_arr, sizeof(char), cmp_char);
+    free (arr);
+}
+
+
+void test_random_arr_double (sort_stf sort)
+{
+    int len_arr = 100;
+    double* arr = generate_random_arr_double (len_arr);
+    sort (arr, len_arr, sizeof(double), cmp_double);
+    free (arr);
+}
+
+
+void test_random_arr_float (sort_stf sort)
+{
+    int len_arr = 100;
+    float* arr = generate_random_arr_float (len_arr);
+    sort (arr, len_arr, sizeof(float), cmp_float);
+    free (arr);
+}
+
+
+void RUN_ALL_TESTS (sort_skf sort)
+{
+    test_empt_arr(sort);
+    test_one_arr(sort);
+    test_two_arr(sort);
+    test_zero_arr(sort);
+    test_big_random_arr(sort);
+    test_random_arr_char(sort);
+    test_random_arr_double(sort);
+    test_random_arr_float(sort);
+
+    printf("Good work, all tests passed!\n");
 }

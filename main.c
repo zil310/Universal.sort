@@ -1,16 +1,16 @@
-#include <stdio.h>
-#include <time.h>
 #include "sort.h"
 #include "test.h"
+#include <stdio.h>
+#include <time.h>
+
 
 
 int main ()
 {
-    srand (time(NULL));
+    srand ((unsigned int)time(NULL))
 
-    test_sort (quick_sort);
-    test_sort (select_sort);
-
-    printf ("Good work, all tests passed!\n");
+    RUN_ALL_TESTS(select_sort);
+    RUN_ALL_TESTS(quick_sort);
+    
     return 0;
 }
