@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 
 typedef int (*cmp_skf)(void* el_a, void* el_b);
@@ -42,143 +43,183 @@ int cmp_double(void* el_a, void* el_b)
 }
 
 
-int* generate_random_arr_int (int len_arr)
-{
-    int* arr = malloc(len_arr * sizeof(int));
-
-    for (int i = 0; i < len_arr; ++i)
-    {
-        arr[i] = rand() % 2298 - 1000;
-    }
-
-    return arr;
-}
-
-
-char* generate_random_arr_char (int len_arr)
-{
-    char* arr = malloc(len_arr * sizeof(char));
-
-    for (int i = 0; i < len_arr; ++i)
-    {
-        arr[i] = 32 + (rand() % 95); // таким образом мы попадаем в диапозон символов печатных по таблице ASCII
-    }
-    return arr;
-}
-
-
-double* generate_random_arr_double (int len_arr)
-{
-    double* arr = malloc(len_arr * sizeof(double));
-
-    for (int i = 0; i < len_arr; ++i)
-    {
-        arr[i] = ((double)rand() / RAND_MAX) * 2000.0 - 1000.0;
-    }
-    return arr;
-}
-
-
-float* generate_random_arr_float (int len_arr)
-{
-    float* arr = malloc(len_arr * sizeof(float));
-
-    for (int i = 0; i < len_arr; ++i)
-    {
-        arr[i] = ((float)rand() / RAND_MAX) * 2000.0f - 1000.0f; // да бы комп понимал что именно float
-    }
-    return arr;
-}
-
-
-void check_sort_arr (void* arr, int len_arr, int el_size, cmp_skf cmp)
+int check_order_arr (void* arr, int len_arr, int el_size, cmp_skf cmp)
 {
     for (int i = 0; i < len_arr - 1; ++i)
     {
         void* add_el = (char*) arr + (i * el_size);
         void* add_next_el = (char*) arr + ((i + 1) * el_size);
-        assert (cmp (add_el, add_next_el) <=0);
+        if ((cmp (add_el, add_next_el) > 0))
+        {
+            return 0;
+        }
     }
+    return 1;
 }
 
 
-void test_empt_arr (sort_stf sort)
+int check_affil_arr (void* orig_arr, void* sort_arr, int len_arr, int el_size)
+{
+    for (int i = 0; i < len_arr; ++i)
+    {
+        void* check_el = (char*) orig_arr + (i * el_size);
+        int count_orig_el = 0;
+        int count_sort_el = 0;
+
+        for (int j = 0; j < len_arr; ++j)
+        {
+            if (memcmp(check_el, (char*) orig_arr + (j * el_size), el_size) == 0)
+            {
+                count_orig_el++;
+            }
+            if (memcmp(check_el, (char*) sort_arr + (j * el_size), el_size) == 0)
+            {
+                count_sort_el++;
+            }
+
+        }
+        if (count_orig_el != count_sort_el)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+
+int check_sort_arr (void* orig_arr, void* sort_arr, int len_arr, int el_size, cmp_skf cmp)
+{
+    return check_order_arr (sort_arr, len_arr, el_size, cmp) && check_affil_arr (orig_arr, sort_arr, len_arr, el_size);
+}
+
+
+void test_empt_arr (sort_stf sort) 
 {
     sort (NULL, 0, sizeof(int), cmp_int);
-    check_sort_arr (NULL, 0, sizeof(int), cmp_int);
+    assert (check_sort_arr(NULL, NULL, 0, sizeof(int), cmp_int));
 }
 
-
-void test_one_arr (sort_stf sort)
+void test_one_arr (sort_stf sort) 
 {
     int arr[] = {1};
+    int orig[] = {1};
     sort (arr, 1, sizeof(int), cmp_int);
-    check_sort_arr (arr, 1, sizeof(int), cmp_int);
+    assert (check_sort_arr(orig, arr, 1, sizeof(int), cmp_int));
 }
 
-
-void test_two_arr (sort_stf sort)
+void test_two_arr (sort_stf sort) 
 {
-    int arr[] = {6,7};
+    int arr[] = {7, 6};
+    int orig[] = {7, 6};
     sort (arr, 2, sizeof(int), cmp_int);
-    check_sort_arr (arr, 2, sizeof(int), cmp_int);
+    assert (check_sort_arr(orig, arr, 2, sizeof(int), cmp_int));
 }
 
-
-void test_zero_arr (sort_stf sort)
-{   
-    int arr[20] = {0}; 
+void test_zero_arr (sort_stf sort) 
+{
+    int arr = {0};
+    int orig = {0};
     sort (arr, 20, sizeof(int), cmp_int);
-    check_sort_arr (arr, 20, sizeof(int), cmp_int);
+    assert (check_sort_arr(orig, arr, 20, sizeof(int), cmp_int))
 }
 
-
-void test_big_random_arr (sort_stf sort)
+void test_big_not_random_arr (sort_stf sort, const char* file_name, int len_arr)
 {
-    int len_arr = 1000;
-    int* arr = generate_random_arr_int (len_arr);
+    FILE* file = fopen (file_name, "r");
+
+    int* orig_arr = malloc (len_arr * sizeof(int));
+    int* arr = malloc (len_arr * sizeof(int));
+    
+    for (int i = 0; i < len_arr; ++i)
+    {
+        fscanf (file, "%d", &arr[i]);
+    }
+    memcpy (orig_arr, arr, len_arr * sizeof(int));
+
     sort (arr, len_arr, sizeof(int), cmp_int);
+    assert (check_sort_arr (orig, arr, len_arr, sizeof(int), cmp_int));
+
     free (arr);
+    free (orig);
+    fclose (file);
 }
 
 
-void test_random_arr_char (sort_stf sort)
+void test_not_random_arr_char (sort_stf sort, const char* file_name, int len_arr)
 {
-    int len_arr = 100;
-    char* arr = generate_random_arr_char (len_arr);
+    FILE* file = fopen (file_name, "r");
+
+    char* orig_arr = malloc (len_arr * sizeof(char));
+    char* arr = malloc (len_arr * sizeof(char));
+    
+    for (int i = 0; i < len_arr; ++i)
+    {
+        fscanf (file, " %c", &arr[i]);
+    }
+    memcpy (orig_arr, arr, len_arr * sizeof(char));
+
     sort (arr, len_arr, sizeof(char), cmp_char);
+    assert (check_sort_arr (orig, arr, len_arr, sizeof(char), cmp_char));
+
     free (arr);
+    free (orig);
+    fclose (file);
 }
 
 
-void test_random_arr_double (sort_stf sort)
+void test_not_random_arr_double (sort_stf sort, const char* file_name, int len_arr)
 {
-    int len_arr = 100;
-    double* arr = generate_random_arr_double (len_arr);
+    FILE* file = fopen (file_name, "r");
+
+    double* orig_arr = malloc (len_arr * sizeof(double));
+    double* arr = malloc (len_arr * sizeof(double));
+    
+    for (int i = 0; i < len_arr; ++i)
+    {
+        fscanf (file, "%lf", &arr[i]);
+    }
+    memcpy (orig_arr, arr, len_arr * sizeof(double));
+
     sort (arr, len_arr, sizeof(double), cmp_double);
+    assert (check_sort_arr (orig, arr, len_arr, sizeof(double), cmp_double));
+
     free (arr);
+    free (orig);
+    fclose (file);
 }
 
 
-void test_random_arr_float (sort_stf sort)
+void test_not_random_arr_float (sort_stf sort, const char* file_name, int len_arr)
 {
-    int len_arr = 100;
-    float* arr = generate_random_arr_float (len_arr);
+    FILE* file = fopen (file_name, "r");
+
+    float* orig_arr = malloc (len_arr * sizeof(float));
+    float* arr = malloc (len_arr * sizeof(float));
+    
+    for (int i = 0; i < len_arr; ++i)
+    {
+        fscanf (file, "%d", &arr[i]);
+    }
+    memcpy (orig_arr, arr, len_arr * sizeof(float));
+
     sort (arr, len_arr, sizeof(float), cmp_float);
+    assert (check_sort_arr (orig, arr, len_arr, sizeof(float), cmp_float));
+
     free (arr);
+    free (orig);
+    fclose (file);
 }
 
 
-void RUN_ALL_TESTS (sort_skf sort)
+void RUN_ALL_TESTS (sort_stf sort) 
 {
-    test_empt_arr(sort);
-    test_one_arr(sort);
-    test_two_arr(sort);
-    test_zero_arr(sort);
-    test_big_random_arr(sort);
-    test_random_arr_char(sort);
-    test_random_arr_double(sort);
-    test_random_arr_float(sort);
+    test_empt_arr (sort);
+    test_one_arr (sort);
+    test_two_arr (sort);
+    test_zero_arr (sort);
 
-    printf("Good work, all tests passed!\n");
+    test_big_not_random_arr (sort, "D:/C/Universal.sel.sort/int.txt", 1000);
+    test_not_random_arr_char (sort, "D:/C/Universal.sel.sort/char.txt", 100);
+    test_not_random_arr_double (sort, "D:/C/Universal.sel.sort/double.txt", 100);
+    test_not_random_arr_float (sort, "D:/C/Universal.sel.sort/float.txt", 100);
 }
