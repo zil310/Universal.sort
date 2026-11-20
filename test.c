@@ -190,10 +190,10 @@ void test_big_not_random_arr (sort_stf sort)
 
     sort (arr, len_arr, sizeof(int), cmp_int);
     fclose (file);
-    assert (check_sort_arr (orig, arr, len_arr, sizeof(int), cmp_int));
+    assert (check_sort_arr (orig_arr, arr, len_arr, sizeof(int), cmp_int));
 
     free (arr);
-    free (orig);
+    free (orig_arr);
 }
 
 
@@ -229,17 +229,17 @@ void test_not_random_arr_char (sort_stf sort)
 
     sort (arr, len_arr, sizeof(char), cmp_char);
     fclose (file);
-    assert (check_sort_arr (orig, arr, len_arr, sizeof(char), cmp_char));
+    assert (check_sort_arr (orig_arr, arr, len_arr, sizeof(char), cmp_char));
 
     free (arr);
-    free (orig);  
+    free (orig_arr);  
 }
 
 
 void test_not_random_arr_double (sort_stf sort)
 {   
     int len_arr = LEN_ARR_DOUBLE
-    const char* file_name = FILE_NAME_CHAR
+    const char* file_name = FILE_NAME_DOUBLE
 
     FILE* file = fopen (file_name, "r");
 
@@ -268,10 +268,10 @@ void test_not_random_arr_double (sort_stf sort)
 
     sort (arr, len_arr, sizeof(double), cmp_double);
     fclose (file);
-    assert (check_sort_arr (orig, arr, len_arr, sizeof(double), cmp_double));
+    assert (check_sort_arr (orig_arr, arr, len_arr, sizeof(double), cmp_double));
 
     free (arr);
-    free (orig);
+    free (orig_arr);
 }
 
 
@@ -301,16 +301,16 @@ void test_not_random_arr_float (sort_stf sort)
     
     for (int i = 0; i < len_arr; ++i)
     {
-        fscanf (file, "%d", &arr[i]);
+        fscanf (file, "%f", &arr[i]);
     }
     memcpy (orig_arr, arr, len_arr * sizeof(float));
 
     sort (arr, len_arr, sizeof(float), cmp_float);
     fclose (file);
-    assert (check_sort_arr (orig, arr, len_arr, sizeof(float), cmp_float));
+    assert (check_sort_arr (orig_arr, arr, len_arr, sizeof(float), cmp_float));
 
     free (arr);
-    free (orig);
+    free (orig_arr);
 }
 
 
