@@ -7,8 +7,43 @@
 #include <string.h>
 
 
+#define LEN_ARR_INT 1000
+#define LEN_ARR_DOUBLE 100
+#define LEN_ARR_CHAR 100
+#define LEN_ARR_FLOAT 100
+
+
+#define FILE_NAME_INT "D:/C/Universal.sel.sort/int.txt"
+#define FILE_NAME_CHAR "D:/C/Universal.sel.sort/char.txt"
+#define FILE_NAME_FLOAT "D:/C/Universal.sel.sort/float.txt"
+#define FILE_NAME_DOUBLE "D:/C/Universal.sel.sort/double.txt"
+
+
+
 typedef int (*cmp_skf)(void* el_a, void* el_b);
 typedef void (*sort_stf)(void* arr, int len_arr, int el_size, cmp_skf cmp);
+
+
+int cmp_int (void* el_a, void* el_b);
+
+
+int cmp_char (void* el_a, void* el_b);
+
+
+int cmp_float (void* el_a, void* el_b);
+
+
+int cmp_double (void* el_a, void* el_b);
+
+
+int check_order_arr (void* arr, int len_arr, int el_size, cmp_skf cmp);
+
+
+int check_affil_arr (void* orig_arr, void* sort_arr, int len_arr, int el_size);
+
+
+int check_sort_arr (void* orig_arr, void* sort_arr, int len_arr, int el_size, cmp_skf cmp);
+
 
 
 int cmp_int(void* el_a, void* el_b) 
@@ -123,12 +158,29 @@ void test_zero_arr (sort_stf sort)
     assert (check_sort_arr(orig, arr, 20, sizeof(int), cmp_int))
 }
 
-void test_big_not_random_arr (sort_stf sort, const char* file_name, int len_arr)
-{
+void test_big_not_random_arr (sort_stf sort)
+{   
+    int len_arr = LEN_ARR_INT;
+    const char* file_name = FILE_NAME_INT
+
     FILE* file = fopen (file_name, "r");
 
+    if (file == NULL)
+    {
+        return;
+    }
+    
     int* orig_arr = malloc (len_arr * sizeof(int));
     int* arr = malloc (len_arr * sizeof(int));
+
+    if (orig_arr == NULL || arr == NULL)
+    {
+        free (orig_arr);
+        free (arr);
+        fclose (file);
+        
+        return;
+    }
     
     for (int i = 0; i < len_arr; ++i)
     {
@@ -137,20 +189,37 @@ void test_big_not_random_arr (sort_stf sort, const char* file_name, int len_arr)
     memcpy (orig_arr, arr, len_arr * sizeof(int));
 
     sort (arr, len_arr, sizeof(int), cmp_int);
+    fclose (file);
     assert (check_sort_arr (orig, arr, len_arr, sizeof(int), cmp_int));
 
     free (arr);
     free (orig);
-    fclose (file);
 }
 
 
-void test_not_random_arr_char (sort_stf sort, const char* file_name, int len_arr)
-{
+void test_not_random_arr_char (sort_stf sort)
+{   
+    int len_arr = LEN_ARR_CHAR
+    const char* file_name = FILE_NAME_CHAR
+    
     FILE* file = fopen (file_name, "r");
 
+    if (file == NULL)
+    {
+        return;
+    }
+    
     char* orig_arr = malloc (len_arr * sizeof(char));
     char* arr = malloc (len_arr * sizeof(char));
+
+        if (orig_arr == NULL || arr == NULL)
+    {
+        free (orig_arr);
+        free (arr);
+        fclose (file);
+        
+        return;
+    }
     
     for (int i = 0; i < len_arr; ++i)
     {
@@ -159,20 +228,37 @@ void test_not_random_arr_char (sort_stf sort, const char* file_name, int len_arr
     memcpy (orig_arr, arr, len_arr * sizeof(char));
 
     sort (arr, len_arr, sizeof(char), cmp_char);
+    fclose (file);
     assert (check_sort_arr (orig, arr, len_arr, sizeof(char), cmp_char));
 
     free (arr);
-    free (orig);
-    fclose (file);
+    free (orig);  
 }
 
 
-void test_not_random_arr_double (sort_stf sort, const char* file_name, int len_arr)
-{
+void test_not_random_arr_double (sort_stf sort)
+{   
+    int len_arr = LEN_ARR_DOUBLE
+    const char* file_name = FILE_NAME_CHAR
+
     FILE* file = fopen (file_name, "r");
+
+        if (file == NULL)
+    {
+        return;
+    }
 
     double* orig_arr = malloc (len_arr * sizeof(double));
     double* arr = malloc (len_arr * sizeof(double));
+
+        if (orig_arr == NULL || arr == NULL)
+    {
+        free (orig_arr);
+        free (arr);
+        fclose (file);
+        
+        return;
+    }
     
     for (int i = 0; i < len_arr; ++i)
     {
@@ -181,20 +267,37 @@ void test_not_random_arr_double (sort_stf sort, const char* file_name, int len_a
     memcpy (orig_arr, arr, len_arr * sizeof(double));
 
     sort (arr, len_arr, sizeof(double), cmp_double);
+    fclose (file);
     assert (check_sort_arr (orig, arr, len_arr, sizeof(double), cmp_double));
 
     free (arr);
     free (orig);
-    fclose (file);
 }
 
 
-void test_not_random_arr_float (sort_stf sort, const char* file_name, int len_arr)
-{
+void test_not_random_arr_float (sort_stf sort)
+{   
+    int len_arr = LEN_ARR_FLOAT
+    const char* file_name = FILE_NAME_FLOAT
+
     FILE* file = fopen (file_name, "r");
+
+        if (file == NULL)
+    {
+        return;
+    }
 
     float* orig_arr = malloc (len_arr * sizeof(float));
     float* arr = malloc (len_arr * sizeof(float));
+
+        if (orig_arr == NULL || arr == NULL)
+    {
+        free (orig_arr);
+        free (arr);
+        fclose (file);
+        
+        return;
+    }
     
     for (int i = 0; i < len_arr; ++i)
     {
@@ -203,23 +306,33 @@ void test_not_random_arr_float (sort_stf sort, const char* file_name, int len_ar
     memcpy (orig_arr, arr, len_arr * sizeof(float));
 
     sort (arr, len_arr, sizeof(float), cmp_float);
+    fclose (file);
     assert (check_sort_arr (orig, arr, len_arr, sizeof(float), cmp_float));
 
     free (arr);
     free (orig);
-    fclose (file);
 }
 
 
-void RUN_ALL_TESTS (sort_stf sort) 
+void RUN_ALL_TESTS () 
 {
-    test_empt_arr (sort);
-    test_one_arr (sort);
-    test_two_arr (sort);
-    test_zero_arr (sort);
+    test_empt_arr (select_sort);
+    test_one_arr (select_sort);
+    test_two_arr (select_sort);
+    test_zero_arr (select_sort);
 
-    test_big_not_random_arr (sort, "D:/C/Universal.sel.sort/int.txt", 1000);
-    test_not_random_arr_char (sort, "D:/C/Universal.sel.sort/char.txt", 100);
-    test_not_random_arr_double (sort, "D:/C/Universal.sel.sort/double.txt", 100);
-    test_not_random_arr_float (sort, "D:/C/Universal.sel.sort/float.txt", 100);
+    test_big_not_random_arr (select_sort);
+    test_not_random_arr_char (select_sort);
+    test_not_random_arr_double (select_sort);
+    test_not_random_arr_float (select_sort);
+
+    test_empt_arr (quick_sort);
+    test_one_arr (quick_sort);
+    test_two_arr (quick_sort);
+    test_zero_arr (quick_sort);
+
+    test_big_not_random_arr (quick_sort);
+    test_not_random_arr_char (quick_sort);
+    test_not_random_arr_double (quick_sort);
+    test_not_random_arr_float (quick_sort);
 }
